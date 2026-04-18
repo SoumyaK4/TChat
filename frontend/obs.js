@@ -74,6 +74,17 @@ function appendMessage(data) {
     const msgElement = document.createElement('div');
     msgElement.className = 'obs-message';
 
+    // Auto-hide message after 100 seconds
+    setTimeout(() => {
+        msgElement.style.transition = 'opacity 1s';
+        msgElement.style.opacity = '0';
+        setTimeout(() => {
+            if (msgElement.parentNode) {
+                msgElement.parentNode.removeChild(msgElement);
+            }
+        }, 1000);
+    }, 100000);
+
     const usernameSpan = document.createElement('span');
     usernameSpan.className = 'obs-username';
     usernameSpan.innerText = `${data.username}: `;

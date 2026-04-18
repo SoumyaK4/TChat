@@ -14,6 +14,10 @@ const messageInput = document.getElementById('message-input');
 const displayUsername = document.getElementById('display-username');
 
 function init() {
+    // Always bind button events once
+    document.getElementById('login-btn').onclick = handleLogin;
+    document.getElementById('set-username-btn').onclick = handleUsernameSetup;
+
     if (!chatPassword) {
         showLogin();
     } else if (!currentUsername) {
@@ -23,30 +27,32 @@ function init() {
     }
 }
 
+function handleLogin() {
+    const pw = document.getElementById('password-input').value;
+    if (pw) {
+        chatPassword = pw;
+        localStorage.setItem('chat-password', pw);
+        loginScreen.classList.add('hidden');
+        init();
+    }
+}
+
+function handleUsernameSetup() {
+    const username = document.getElementById('username-input').value;
+    if (username) {
+        currentUsername = username;
+        localStorage.setItem('chat-username', username);
+        usernameScreen.classList.add('hidden');
+        init();
+    }
+}
+
 function showLogin() {
     loginScreen.classList.remove('hidden');
-    document.getElementById('login-btn').onclick = () => {
-        const pw = document.getElementById('password-input').value;
-        if (pw) {
-            chatPassword = pw;
-            localStorage.setItem('chat-password', pw);
-            loginScreen.classList.add('hidden');
-            init();
-        }
-    };
 }
 
 function showUsernameSetup() {
     usernameScreen.classList.remove('hidden');
-    document.getElementById('set-username-btn').onclick = () => {
-        const username = document.getElementById('username-input').value;
-        if (username) {
-            currentUsername = username;
-            localStorage.setItem('chat-username', username);
-            usernameScreen.classList.add('hidden');
-            init();
-        }
-    };
 }
 
 function startChat() {
