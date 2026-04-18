@@ -18,6 +18,11 @@ function init() {
     document.getElementById('login-btn').onclick = handleLogin;
     document.getElementById('set-username-btn').onclick = handleUsernameSetup;
 
+    // Hide everything first
+    loginScreen.classList.add('hidden');
+    usernameScreen.classList.add('hidden');
+    chatContainer.classList.add('hidden');
+
     if (!chatPassword) {
         showLogin();
     } else if (!currentUsername) {
@@ -62,7 +67,11 @@ function startChat() {
     connectWebSocket();
 }
 
+let isConnecting = false;
 async function connectWebSocket() {
+    if (isConnecting || (socket && socket.readyState === WebSocket.OPEN)) return;
+    isConnecting = true;
+
     // 1. Get a temporary token using the password
     let token = '';
     try {
@@ -101,6 +110,7 @@ async function connectWebSocket() {
     socket = new WebSocket(url);
 
     socket.onopen = () => {
+        isConnecting = false;
         console.log('Connected to chat');
     };
 
@@ -128,6 +138,7 @@ async function connectWebSocket() {
     };
 
     socket.onclose = (event) => {
+        isConnecting = false;
         console.log('Disconnected. Code:', event.code);
         // 4001 is a custom code we could use, but standard 401 results in a generic close
         // If it closes immediately without ever opening, or with a specific error

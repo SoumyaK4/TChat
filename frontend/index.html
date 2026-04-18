@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark-theme">
-    <div id="login-screen" class="modal">
+    <div id="login-screen" class="modal hidden">
         <div class="modal-content">
             <h2>Enter Password</h2>
             <input type="password" id="password-input" placeholder="Password">
@@ -33,7 +33,7 @@
         </header>
         <div id="chat-messages"></div>
         <form id="chat-form">
-            <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+            <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" maxlength="300">
             <button type="submit">Send</button>
         </form>
     </div>
