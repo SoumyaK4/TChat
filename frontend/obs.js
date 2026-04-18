@@ -57,7 +57,14 @@ async function connectWebSocket() {
             const lastTen = data.messages.slice(-10);
             lastTen.forEach(msg => appendMessage(msg));
         } else if (data.type === 'chat') {
-            appendMessage(data);
+            // Optional: Hide messages from overlay if relayonly is true
+            if (urlParams.get('relayonly') !== 'true') {
+                appendMessage(data);
+            }
+
+            // Relay to Firebot for Twitch
+            relayToTwitch(data.username, data.message);
+
             // Limit messages on screen
             if (messagesDiv.children.length > 15) {
                 messagesDiv.removeChild(messagesDiv.firstChild);
@@ -100,6 +107,29 @@ function appendMessage(data) {
 
     // Auto scroll to bottom
     window.scrollTo(0, document.body.scrollHeight);
+}
+
+function relayToTwitch(username, message) {
+    // Format: " username : message "
+    const relayMessage = ` ${username} : ${message} `;
+
+    // Post to Firebot's local API (localhost:7472)
+    // Firebot's Browser Source allows talking to localhost even from HTTPS.
+    // Using the 'type' field which Firebot expects for built-in effects.
+    fetch('http://localhost:7472/api/v1/effects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            effects: [
+                {
+                    id: 'firebot:chat',
+                    type: 'firebot:chat',
+                    message: relayMessage,
+                    chatter: 'Streamer'
+                }
+            ]
+        })
+    }).catch(err => console.error('[Firebot Relay] Failed. Is Firebot API enabled on port 7472?', err));
 }
 
 function getUsernameColor(username) {
