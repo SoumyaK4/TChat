@@ -57,7 +57,11 @@ async function connectWebSocket() {
             const lastTen = data.messages.slice(-10);
             lastTen.forEach(msg => appendMessage(msg));
         } else if (data.type === 'chat') {
-            appendMessage(data);
+            if (urlParams.get('relayonly') !== 'true') {
+                appendMessage(data);
+            }
+            // Relay to Firebot for Twitch
+            relayToFirebot(data.username, data.message);
             // Limit messages on screen
             if (messagesDiv.children.length > 15) {
                 messagesDiv.removeChild(messagesDiv.firstChild);
@@ -100,6 +104,28 @@ function appendMessage(data) {
 
     // Auto scroll to bottom
     window.scrollTo(0, document.body.scrollHeight);
+}
+
+function relayToFirebot(username, message) {
+    // Format: " username : message "
+    const relayMessage = ` ${username} : ${message} `;
+
+    // Trigger the 'firebot:chat' effect to send a message to Twitch
+    // We use localhost because this script runs within your OBS Browser Source locally
+    fetch('http://localhost:7472/api/v1/effects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            effects: [
+                {
+                    id: 'firebot:chat',
+                    type: 'firebot:chat',
+                    message: relayMessage,
+                    chatter: 'Bot'
+                }
+            ]
+        })
+    }).catch(err => console.error('[Firebot] Failed to relay (Is Firebot running?):', err));
 }
 
 function getUsernameColor(username) {
