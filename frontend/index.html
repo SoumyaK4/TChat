@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div id="login-screen" class="modal">
+        <div class="modal-content">
+            <h2>Enter Password</h2>
+            <input type="password" id="password-input" placeholder="Password">
+            <button id="login-btn">Login</button>
+        </div>
+    </div>
+
+    <div id="username-screen" class="modal hidden">
+        <div class="modal-content">
+            <h2>Set Username</h2>
+            <input type="text" id="username-input" placeholder="Username">
+            <button id="set-username-btn">Start Chatting</button>
+        </div>
+    </div>
+
+    <div id="chat-container" class="hidden">
+        <header>
+            <h1>Dark Chat</h1>
+            <div class="user-info">
+                <span id="display-username"></span>
+                <button id="change-username-btn">Change</button>
+            </div>
+        </header>
+        <div id="chat-messages"></div>
+        <form id="chat-form">
+            <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
