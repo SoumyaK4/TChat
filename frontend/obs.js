@@ -134,18 +134,12 @@ function relayToTwitch(username, message) {
     // Configurable Preset ID (default to the one created by user)
     const presetId = urlParams.get('firebotPresetId') || '8bd07347-2a73-4694-b37e-5ed7caf4b872';
 
-    // Post to Firebot's local API (127.0.0.1:7472)
-    // We use a Preset Effect List because it's the most reliable way to pass dynamic data to Firebot.
-    fetch(`http://127.0.0.1:7472/api/v1/effects/preset/${presetId}/run`, {
-        method: 'POST',
-        // Use text/plain to avoid CORS preflight which can be blocked by Private Network Access rules
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-            username: 'System',
-            args: {
-                arg1: relayMessage
-            }
-        }),
+    // Use GET request to Firebot's local API (127.0.0.1:7472)
+    // GET is used to bypass CORS/PNA security blocks and ensure the payload is correctly parsed by Firebot.
+    const url = `http://127.0.0.1:7472/api/v1/effects/preset/${presetId}/run?arg1=${encodeURIComponent(relayMessage)}`;
+
+    fetch(url, {
+        method: 'GET',
         // Experimental flag to help with Chrome's Private Network Access security
         targetAddressSpace: 'local'
     })
