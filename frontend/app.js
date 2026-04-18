@@ -75,8 +75,13 @@ async function connectWebSocket() {
             body: JSON.stringify({ password: chatPassword }),
             headers: { 'Content-Type': 'application/json' }
         });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+
         const data = await response.json();
-        if (data.error) throw new Error(data.error);
         token = data.token;
     } catch (err) {
         console.error('Login failed:', err);
