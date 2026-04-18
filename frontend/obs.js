@@ -8,6 +8,24 @@ const WORKER_URL = '{{WORKER_URL}}';
 const messagesDiv = document.getElementById('obs-messages');
 
 function init() {
+    if (urlParams.get('debug') === 'true' || urlParams.get('test') === 'true') {
+        const debugPanel = document.getElementById('debug-panel');
+        if (debugPanel) debugPanel.style.display = 'block';
+
+        const testBtn = document.getElementById('test-relay-btn');
+        const statusDiv = document.getElementById('debug-status');
+
+        if (testBtn) {
+            testBtn.onclick = () => {
+                statusDiv.innerText = 'Sending...';
+                relayToTwitch('DebugUser', 'Manual test from OBS button');
+                setTimeout(() => {
+                    statusDiv.innerText = 'Sent (Check Twitch/Firebot)';
+                }, 1000);
+            };
+        }
+    }
+
     if (urlParams.get('test') === 'true') {
         appendMessage({ username: 'System', message: 'This is a test message' });
         appendMessage({ username: 'User1', message: 'Hello from OBS!' });
@@ -113,23 +131,30 @@ function relayToTwitch(username, message) {
     // Format: " username : message "
     const relayMessage = ` ${username} : ${message} `;
 
-    // Post to Firebot's local API (localhost:7472)
-    // Firebot's Browser Source allows talking to localhost even from HTTPS.
-    // Using the 'type' field which Firebot expects for built-in effects.
-    fetch('http://localhost:7472/api/v1/effects', {
+    // Configurable Preset ID (default to the one created by user)
+    const presetId = urlParams.get('firebotPresetId') || '8bd07347-2a73-4694-b37e-5ed7caf4b872';
+
+    // Post to Firebot's local API (127.0.0.1:7472)
+    // We use a Preset Effect List because it's the most reliable way to pass dynamic data to Firebot.
+    fetch(`http://127.0.0.1:7472/api/v1/effects/preset/${presetId}/run`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        // Use text/plain to avoid CORS preflight which can be blocked by Private Network Access rules
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
-            effects: [
-                {
-                    id: 'firebot:chat',
-                    type: 'firebot:chat',
-                    message: relayMessage,
-                    chatter: 'Streamer'
-                }
-            ]
-        })
-    }).catch(err => console.error('[Firebot Relay] Failed. Is Firebot API enabled on port 7472?', err));
+            username: 'System',
+            args: {
+                arg1: relayMessage
+            }
+        }),
+        // Experimental flag to help with Chrome's Private Network Access security
+        targetAddressSpace: 'local'
+    })
+    .then(res => {
+        if (!res.ok) console.warn('[Firebot Relay] Response not OK:', res.status);
+    })
+    .catch(err => {
+        console.error('[Firebot Relay] Failed. Is Firebot running and API enabled?', err);
+    });
 }
 
 function getUsernameColor(username) {

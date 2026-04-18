@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="obs-view">
+    <div id="debug-panel" style="display: none; position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px; z-index: 1000;">
+        <button id="test-relay-btn" style="padding: 5px 10px; cursor: pointer;">Test Firebot Relay</button>
+        <div id="debug-status" style="font-size: 10px; margin-top: 5px; color: #aaa;">Ready</div>
+    </div>
     <div id="obs-messages"></div>
     <script src="obs.js"></script>
 </body>
