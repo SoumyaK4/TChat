@@ -60,7 +60,16 @@ async function connectWebSocket() {
     // 1. Get a temporary token using the password
     let token = '';
     try {
-        const httpUrl = WORKER_URL.replace('wss://', 'https://').replace('ws://', 'http://').replace('/ws', '');
+        const httpUrl = WORKER_URL.replace('wss://', 'https://').replace('ws://', 'http://').replace('/ws', '').replace(/\/$/, '');
+
+        // Debug: check status first
+        try {
+            const statusCheck = await fetch(httpUrl);
+            console.log('Worker status:', await statusCheck.text());
+        } catch (e) {
+            console.warn('Status check failed (expected if CORS is strict on /):', e);
+        }
+
         const response = await fetch(`${httpUrl}/login`, {
             method: 'POST',
             body: JSON.stringify({ password: chatPassword }),
