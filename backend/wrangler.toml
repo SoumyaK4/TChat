@@ -1,0 +1,23 @@
+name = "chat-backend"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+# CHAT_PASSWORD should be set via wrangler secret put CHAT_PASSWORD
+# or in the Cloudflare dashboard. For local dev, you can add it here or in .dev.vars
+CHAT_PASSWORD = "244466666"
+
+[[durable_objects.bindings]]
+name = "CHAT_ROOM"
+class_name = "ChatRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ChatRoom"]
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+invocation_logs = true
